@@ -2,7 +2,7 @@ import 'reflect-metadata'
 
 const classArr = []
 
-@Controller('/test')
+@Controller('/middlewareExample')
 class Test {
     id: string
 
@@ -22,7 +22,7 @@ class Test {
     }
 }
 
-// const test = new Test()
+// const middlewareExample = new Test()
 
 function Controller(prefix: string) {
     return function (target: any) {

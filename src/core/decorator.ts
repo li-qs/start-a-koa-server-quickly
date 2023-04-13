@@ -1,15 +1,23 @@
 import 'reflect-metadata'
 import {
     METADATA_METHOD,
+    METADATA_MIDDLEWARES,
     METADATA_PATH,
     METADATA_PREFIX,
     REQUEST_METHODS,
 } from './constants'
+import { Middleware } from 'koa'
 
 export function Controller(prefix?: string) {
     prefix = prefix && prefix.length ? prefix : '/'
     return function (target: any) {
         Reflect.defineMetadata(METADATA_PREFIX, prefix, target)
+    }
+}
+
+export function Middlewares(middlewares: Middleware[]) {
+    return function (target: any) {
+        Reflect.defineMetadata(METADATA_MIDDLEWARES, middlewares, target)
     }
 }
 
@@ -40,3 +48,18 @@ export const Patch = createMethodDecorator(REQUEST_METHODS.PATCH)
 export const Options = createMethodDecorator(REQUEST_METHODS.OPTIONS)
 export const Head = createMethodDecorator(REQUEST_METHODS.HEAD)
 export const All = createMethodDecorator(REQUEST_METHODS.ALL)
+
+export function Before(middlewares: Middleware[]) {
+    return function (
+        target: any,
+        propertyKey: string | symbol,
+        descriptor: TypedPropertyDescriptor<any>
+    ) {
+        Reflect.defineMetadata(
+            METADATA_MIDDLEWARES,
+            middlewares,
+            descriptor.value
+        )
+        return descriptor
+    }
+}

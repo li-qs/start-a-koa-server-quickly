@@ -3,10 +3,11 @@ import * as Router from '@koa/router'
 import {
     FUNCTION_CONSTRUCTOR,
     METADATA_METHOD,
+    METADATA_MIDDLEWARES,
     METADATA_PATH,
     METADATA_PREFIX,
 } from './constants'
-import Application from 'koa'
+import Application, { Middleware } from 'koa'
 
 export class RouteRegister {
     private readonly app: Application
@@ -17,13 +18,15 @@ export class RouteRegister {
 
     register(cls: new () => any) {
         const prefix: string = Reflect.getMetadata(METADATA_PREFIX, cls)
+        const middlewares: Middleware[] =
+            Reflect.getMetadata(METADATA_MIDDLEWARES, cls) || []
         const dynamicFuncNames: Array<string | symbol> = Reflect.ownKeys(
             cls.prototype
         )
         const controller = new cls()
         const router = new Router()
         router.prefix(prefix)
-        let i = 0
+        router.use(...middlewares)
         dynamicFuncNames.forEach((funcName) => {
             if (
                 funcName === FUNCTION_CONSTRUCTOR ||
@@ -46,11 +49,17 @@ export class RouteRegister {
                 METADATA_PATH,
                 controller[funcName]
             )
-            router[requestMethod](requestPath, controller[funcName])
-            i++
+            const middlewares =
+                Reflect.getMetadata(
+                    METADATA_MIDDLEWARES,
+                    controller[funcName]
+                ) || []
+            router[requestMethod](
+                requestPath,
+                ...middlewares,
+                controller[funcName]
+            )
         })
-        if (i > 0) {
-            this.app.use(router.routes()).use(router.allowedMethods())
-        }
+        this.app.use(router.routes()).use(router.allowedMethods())
     }
 }

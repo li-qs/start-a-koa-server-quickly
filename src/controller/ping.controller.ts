@@ -1,9 +1,12 @@
 import { Context } from 'koa'
 import { successful } from '../util/formater'
 import { mysql, redis } from '../connection'
-import { Controller, Get } from '../core/decorator'
+import { Before, Controller, Get, Middlewares } from '../core/decorator'
+import { middlewareExample } from '../middleware/middlewareExample'
+import { middlewareExample2 } from '../middleware/middlewareExample2'
 
 @Controller('/ping')
+@Middlewares([middlewareExample])
 export default class PingController {
     @Get('/')
     async ping(ctx: Context) {
@@ -19,6 +22,12 @@ export default class PingController {
     @Get('/redis')
     async redis(ctx: Context) {
         await redis.get('1')
+        ctx.body = successful()
+    }
+
+    @Get('/middleware')
+    @Before([middlewareExample2])
+    async middleware(ctx: Context) {
         ctx.body = successful()
     }
 }
