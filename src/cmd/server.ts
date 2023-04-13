@@ -1,26 +1,21 @@
-import Application, { Context } from 'koa'
-import * as Router from '@koa/router'
+import Application from 'koa'
+import * as config from 'config'
 import * as logger from 'koa-logger'
 import * as json from 'koa-json'
 import * as bodyParser from 'koa-bodyparser'
-import { loadRouters } from '../router'
-import { runConfig } from '../config'
 import catchError from '../middleware/catchError'
+import { RouteRegister } from '../core/routeRegister'
+import PingController from '../controller/ping.controller'
 
+const host = config.get('serv.host') as string
+const port = Number(config.get('serv.port'))
 const app = new Application()
-const router = new Router()
-
-router.get('/ping', async (ctx: Context) => {
-    ctx.body = 'pong'
-})
-
 app.use(catchError)
 app.use(bodyParser())
 app.use(json())
 app.use(logger())
-app.use(router.routes()).use(router.allowedMethods())
-loadRouters(app)
-
-app.listen(runConfig.port, () => {
-    console.log(`Listening on port ${runConfig.port}...\n`)
+const t = new RouteRegister(app)
+t.register(PingController)
+app.listen(port, host, () => {
+    console.log(`Listening on ${host}:${port}\n`)
 })
