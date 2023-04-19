@@ -1,5 +1,5 @@
 import { Context, Next } from 'koa'
-import { response } from '../../util/formater'
+import { response } from '../util/formater'
 
 export default async function catchError(ctx: Context, next: Next) {
     try {
