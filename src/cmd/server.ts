@@ -1,13 +1,19 @@
+import Application from 'koa'
 import * as config from 'config'
-import { AppFactory } from '../core/appFactory'
-import PingController from '../controller/ping.controller'
-import catchError from '../middleware/catchError'
+import * as bodyParser from 'koa-bodyparser'
+import * as json from 'koa-json'
+import { registerControllers } from 'koa-controller-register'
+import { controllers } from './controllers'
 
 const host = config.get('serv.host') as string
 const port = Number(config.get('serv.port'))
 
-const controllers = [PingController]
-const app = AppFactory.create(controllers, catchError)
+const app = new Application()
+
+app.use(bodyParser())
+app.use(json())
+registerControllers(app, controllers)
+
 app.listen(port, host, () => {
     console.log(`Listening on ${host}:${port}\n`)
 })

@@ -1,9 +1,9 @@
 import { Context } from 'koa'
 import { successful } from '../util/formater'
 import { mysql, redis } from '../connection'
-import { Before, Controller, Get, Middlewares } from '../core/decorator'
 import { middlewareExample } from '../middleware/middlewareExample'
 import { middlewareExample2 } from '../middleware/middlewareExample2'
+import { Before, Controller, Get, Middlewares } from 'koa-controller-register'
 
 @Controller('/ping')
 @Middlewares([middlewareExample])
