@@ -1,6 +1,6 @@
 import Application from 'koa'
 import * as config from 'config'
-import * as bodyParser from 'koa-bodyparser'
+import koaBody from 'koa-body'
 import * as json from 'koa-json'
 import { registerControllers } from 'koa-controller-register'
 import { controllers } from './controllers'
@@ -10,7 +10,7 @@ const port = Number(config.get('serv.port'))
 
 const app = new Application()
 
-app.use(bodyParser())
+app.use(koaBody())
 app.use(json())
 registerControllers(app, controllers)
 
